@@ -1,4 +1,5 @@
 #include <opencv2/opencv.hpp>
+#include "LetterLocalizer.h"
 #include "SWT.h"
 #include "util.h"
 #include "LetterCandidate.h"
@@ -25,55 +26,11 @@ int main( int argc, char** argv )
 	// Start time measurement
 	double t = (double)getTickCount();
 
-	// Convert to gray scale
-	Mat srcGray;
-	cvtColor( image, srcGray, CV_BGR2GRAY);
-
-	// Perform MSER detection on gray scale image
-	Ptr<MSER> ms = MSER::create(4, 40, 8000, 0.05, 1.25, 200, 1.01, 0.003, 5);
-	vector<vector<Point> > regions;
-	vector<cv::Rect> mserBbox;
-	ms->detectRegions(srcGray, regions, mserBbox);
-	cout << "Found " << regions.size() << " MSER regions" << "\n";
-
-	// Draw and re-extract MSER regions
-	Mat mserStroke = Mat(image.size(), CV_8UC1);
-	for(uint i = 0; i < regions.size(); i++)
-	{
-		for(uint j = 0; j < regions[i].size(); j++)
-		{
-			mserStroke.at<uchar>(regions[i][j]) = 255;
-		}
-	}
-
-	vector<Vec4i> hierarchy = vector<Vec4i>();
-	findContours(mserStroke, regions, hierarchy,
-				 CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-	cout << "Merging left " << regions.size() << " regions\n";
-
-	// Filter regions based on geometric region properties
-	vector<vector<Point>> validRegions;
-	thai::getValidRegionIdx(regions, validRegions);
-	cout << "Geometric tests left " << validRegions.size() << " regions" << "\n";
-
-	// Free memory
-	//regions.clear();
-
-	mserStroke = Mat::zeros(mserStroke.size(), CV_8UC1);
-	drawContours(mserStroke, validRegions, -1, Scalar(255), -1);
-
-	// Calculate stroke width based on MSER regions
-	Mat outStroke;
-	thai::SWT SWDetector = thai::SWT();
-	SWDetector.detectStrokeInBinary(mserStroke, outStroke);
-
-	vector<thai::LetterCandidate> letters;
-	thai::regionsToLetterCandidates(validRegions, letters, outStroke);
-	SWDetector.testStrokeWidthVariance(letters, 0.5);
-	cout << "Stroke width filtering left " << letters.size() << " regions\n";
-
+	//LetterLocalizer call
 	vector<thai::TextLine> textLines;
-	formWordLines(letters, textLines);
+	thai::LetterLocalizer localizer = thai::LetterLocalizer();
+	localizer.localizeText(image, textLines);
+
 	for(uint i = 0; i < textLines.size(); i++)
 	{
 		cout << "Line " << i << ": ";
@@ -100,12 +57,6 @@ int main( int argc, char** argv )
 			box = box | textLines[i][j].getBBox();
 		}
 		rectangle(image, box, Scalar(0, 0, 255), 2);
-	}
-
-	for(uint i = 0; i < letters.size(); i++)
-	{
-		rectangle(image, letters[i].getMainBoundary(), Scalar(0, 255, 0), 1);
-
 	}
 
 	// Resize image to fit screen
