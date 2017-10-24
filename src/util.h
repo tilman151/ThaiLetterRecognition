@@ -20,8 +20,6 @@ namespace thai {
 
 	typedef pair<LetterCandidate&,LetterCandidate&> LetterPair;
 
-	unsigned long hashCvPoint(const Point& p);
-
 	bool compareCvPoints(const Point& a, const Point& b);
 
 	bool comparePairs(const LetterPair& a, const LetterPair& b);

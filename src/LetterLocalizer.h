@@ -33,10 +33,6 @@ private:
 	void getValidRegionIdx(vector<vector<Point>>& regions,
 						   vector<vector<Point>>& validRegions);
 
-	void removeApproxDuplicatesRegions(vector<vector<Point>>& regions,
-						  	  	  	   double ratio,
-									   vector<Rect>& bBoxes);
-
 	void regionsToLetterCandidates(vector<vector<Point>>&	regions,
 								   vector<LetterCandidate>&	letters,
 								   Mat						strokeImage);

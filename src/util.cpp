@@ -12,14 +12,6 @@
 
 namespace thai {
 
-// Custom hash function for CV::Point
-unsigned long hashCvPoint(const Point& p)
-{
-		unsigned long seed = 0;
-		boost::hash_combine(seed, p.x);
-		boost::hash_combine(seed, p.y);
-		return seed;
-}
 
 bool compareCvPoints(const Point& a, const Point& b)
 {

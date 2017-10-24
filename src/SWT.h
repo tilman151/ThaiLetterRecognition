@@ -28,16 +28,6 @@ public:
 					  int			direction);
 	void detectStrokeInBinary(InputArray	_src,
 							  OutputArray	_dst);
-	void detectStrokeInBinaryPointers(InputArray		_src,
-								   	  InputOutputArray	_dst);
-	void connectStroke(InputArray				_src,
-					   OutputArray				_dst,
-			   	   	   vector<vector<Point>>&	letterCandidates,
-					   vector<Rect>&			bBoxes,
-					   double					maxRatio);
-	void testStrokeWidthVariance(vector<vector<Point>>&	regions,
-			  	  	  	  	  	 Mat& 					strokeImage,
-								 double					maxRatio);
 	void testStrokeWidthVariance(vector<LetterCandidate>&	letters,
 								 double						maxRatio);
 };

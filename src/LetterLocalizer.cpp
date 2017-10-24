@@ -74,7 +74,7 @@ void LetterLocalizer::localizeText(Mat image, vector<TextLine>& textLines)
 
 // Geometric validation tests for MSER regions
 void LetterLocalizer::getValidRegionIdx(vector<vector<Point>>& regions,
-					   vector<vector<Point>>& validRegions)
+					   	   	   	   	    vector<vector<Point>>& validRegions)
 {
 
 	validRegions.reserve(regions.size());
@@ -131,84 +131,9 @@ void LetterLocalizer::getValidRegionIdx(vector<vector<Point>>& regions,
 	}
 }
 
-// Check list for intersecting regions and merge them
-void LetterLocalizer::removeApproxDuplicatesRegions(vector<vector<Point>>& regions,
-					  	  	  	   double ratio,
-								   vector<Rect>& bBoxes)
-{
-
-	if(bBoxes.size() == 0)
-	{
-		for(uint i = 0; i < regions.size(); i++)
-		{
-			bBoxes.push_back(boundingRect(regions[i]));
-		}
-	}
-
-	vector<uint> validIdx = vector<uint>();
-	unordered_set<uint> skipSet = unordered_set<uint>();
-	for(uint r1 = 0; r1 < regions.size()-1; r1++)
-	{
-
-		if(skipSet.find(r1) != skipSet.end())
-		{
-			continue;
-		}
-
-		uint maxRegionIdx = r1;
-		for(uint r2 = r1+1; r2 < regions.size(); r2++)
-		{
-			if((bBoxes[r1] & bBoxes[r2]).area() == 0)
-			{
-				continue;
-			}
-
-			Rect unionBound = bBoxes[r1] | bBoxes[r2];
-			Point upperLeftBound = Point(unionBound.x, unionBound.y);
-			Mat r1Map = Mat::zeros(unionBound.size(), CV_8UC1);
-			Mat r2Map = Mat::zeros(unionBound.size(), CV_8UC1);
-			for(uint p = 0; p < regions[r1].size(); p++)
-			{
-				r1Map.at<uchar>(regions[r1][p]-upperLeftBound) = 255;
-			}
-
-			for(uint p = 0; p < regions[r2].size(); p++)
-			{
-				r2Map.at<uchar>(regions[r2][p]-upperLeftBound) = 255;
-			}
-
-			Mat interMap;
-			bitwise_and(r1Map, r2Map, interMap);
-
-			int intersectionArea = countNonZero(interMap);
-
-			if((double)intersectionArea / (double)regions[r1].size() >= ratio ||
-			   (double)intersectionArea / (double)regions[r2].size() >= ratio)
-			{
-				if(regions[r2].size() > regions[r1].size())
-				{
-					maxRegionIdx = r2;
-				}
-				skipSet.insert(r2);
-			}
-		}
-
-		validIdx.push_back(maxRegionIdx);
-	}
-
-	vector<vector<Point>> validRegions = vector<vector<Point>>();
-	for(uint i = 0; i < validIdx.size(); i++)
-	{
-		validRegions.push_back(regions[validIdx[i]]);
-	}
-
-    regions = validRegions;
-
-}
-
 void LetterLocalizer::regionsToLetterCandidates(vector<vector<Point>>&	regions,
-							   vector<LetterCandidate>&	letters,
-							   Mat						strokeImage)
+							   	   	   	   	   vector<LetterCandidate>&	letters,
+											   Mat					strokeImage)
 {
 
 	letters = vector<LetterCandidate>();
@@ -241,7 +166,7 @@ void LetterLocalizer::regionsToLetterCandidates(vector<vector<Point>>&	regions,
 }
 
 void LetterLocalizer::formWordLines(vector<LetterCandidate>&	letters,
-				   vector<TextLine>& textLines)
+				   	   	   	   	    vector<TextLine>& textLines)
 {
 
 	vector<LetterPair> letterPairs = vector<LetterPair>();
