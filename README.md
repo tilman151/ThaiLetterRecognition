@@ -32,4 +32,4 @@ Port code to Android and add Google Translator API to translate text on image.
 
 ## Project Status
 
-Tune performance of working features. Code clean up in progress.
+Tune performance of working features. Code clean up complete.
