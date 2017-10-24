@@ -15,6 +15,8 @@
 using namespace cv;
 using namespace std;
 
+namespace thai {
+
 typedef pair<LetterCandidate&,LetterCandidate&> LetterPair;
 typedef vector<LetterCandidate> TextLine;
 
@@ -39,5 +41,7 @@ void regionsToLetterCandidates(vector<vector<Point>>&	regions,
 
 void formWordLines(vector<LetterCandidate>&	letters,
 				   vector<TextLine>&	    textLines);
+
+} /* namespace thai */
 
 #endif /* SRC_UTIL_H_ */

@@ -14,6 +14,8 @@
 using namespace cv;
 using namespace std;
 
+namespace thai {
+
 class SWT {
 public:
 	SWT();
@@ -39,5 +41,7 @@ public:
 	void testStrokeWidthVariance(vector<LetterCandidate>&	letters,
 								 double						maxRatio);
 };
+
+} /* namespace thai */
 
 #endif /* SRC_SWT_H_ */

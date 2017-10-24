@@ -8,14 +8,16 @@
 #include "LetterCandidate.h"
 
 namespace std {
-  template <> struct hash<LetterCandidate>
+  template <> struct hash<thai::LetterCandidate>
   {
-    size_t operator()(const LetterCandidate & x) const
+    size_t operator()(const thai::LetterCandidate & x) const
     {
       return hash<int>()(x.getIndex());
     }
   };
 }
+
+namespace thai {
 
 LetterCandidate::LetterCandidate() {
 	this->index = -1;
@@ -140,3 +142,5 @@ bool LetterCandidate::sameLineAs(LetterCandidate& candidate)
 	// Probably same line
 	return true;
 }
+
+} /* namespace thai */

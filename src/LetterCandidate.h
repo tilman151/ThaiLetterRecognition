@@ -14,6 +14,8 @@
 using namespace cv;
 using namespace std;
 
+namespace thai {
+
 class LetterCandidate {
 
 public:
@@ -42,5 +44,7 @@ private:
 	unordered_set<int> members;
 
 };
+
+} /* namespace thai */
 
 #endif /* SRC_LETTERCANDIDATE_H_ */

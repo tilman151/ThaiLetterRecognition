@@ -53,7 +53,7 @@ int main( int argc, char** argv )
 
 	// Filter regions based on geometric region properties
 	vector<vector<Point>> validRegions;
-	getValidRegionIdx(regions, validRegions);
+	thai::getValidRegionIdx(regions, validRegions);
 	cout << "Geometric tests left " << validRegions.size() << " regions" << "\n";
 
 	// Free memory
@@ -64,15 +64,15 @@ int main( int argc, char** argv )
 
 	// Calculate stroke width based on MSER regions
 	Mat outStroke;
-	SWT SWDetector = SWT();
+	thai::SWT SWDetector = thai::SWT();
 	SWDetector.detectStrokeInBinary(mserStroke, outStroke);
 
-	vector<LetterCandidate> letters;
-	regionsToLetterCandidates(validRegions, letters, outStroke);
+	vector<thai::LetterCandidate> letters;
+	thai::regionsToLetterCandidates(validRegions, letters, outStroke);
 	SWDetector.testStrokeWidthVariance(letters, 0.5);
 	cout << "Stroke width filtering left " << letters.size() << " regions\n";
 
-	vector<TextLine> textLines;
+	vector<thai::TextLine> textLines;
 	formWordLines(letters, textLines);
 	for(uint i = 0; i < textLines.size(); i++)
 	{

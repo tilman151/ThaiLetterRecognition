@@ -10,6 +10,8 @@
 #include <boost/functional/hash.hpp>
 #include <unordered_set>
 
+namespace thai {
+
 // Geometric validation tests for MSER regions
 void getValidRegionIdx(vector<vector<Point>>& regions,
 					   vector<vector<Point>>& validRegions)
@@ -253,3 +255,5 @@ void formWordLines(vector<LetterCandidate>&	letters,
 	}
 
 }
+
+} /* namespace thai */

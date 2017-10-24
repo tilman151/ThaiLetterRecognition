@@ -10,6 +10,8 @@
 #include <math.h>
 #include "util.h"
 
+namespace thai {
+
 SWT::SWT() {
 	// TODO Auto-generated constructor stub
 
@@ -497,3 +499,5 @@ void SWT::testStrokeWidthVariance(vector<LetterCandidate>&	letters,
 	letters = validRegions;
 
 }
+
+} /* namespace thai */
