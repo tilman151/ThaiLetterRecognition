@@ -1,7 +1,7 @@
 """A script to generate a Thai letter dataset
 
 This script generate 64x64 pictures of all Thai letters in different fonts and
-colors and puts them in a subfolder of its directory. The fonts used are
+colors and puts them in a subfolder of its directory. The fonts are
 provided by:
 
 https://github.com/lannainnovation/thai-font-collection
@@ -15,6 +15,7 @@ from PIL import ImageFont
 from PIL import ImageDraw
 import os
 import shutil
+import csv
 
 # Letters of the Thai alphabet
 thaiAlphabet = ['ก', 'ข', 'ฃ', 'ค', 'ฅ', 'ฆ', 'ง', 'จ', 'ฉ', 'ช', 'ซ', 'ฌ',
@@ -51,6 +52,10 @@ if os.path.exists('./images/'):
     shutil.rmtree('./images/')
 os.makedirs('./images/')
 
+labelFile = open('./images/labels.csv', 'w', newline='')
+labelWriter = csv.writer(labelFile, delimiter=' ',
+                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
 # For each letter in each font and color create one 64x64 image
 for i, letter in enumerate(thaiAlphabet):
     for f, fontName in enumerate(fontNames):
@@ -60,6 +65,9 @@ for i, letter in enumerate(thaiAlphabet):
             font = ImageFont.truetype(fontName, 35)
             draw.text((25, 10), letter, fill=color, font=font)
             img.save('./images/' +
-                     'Image' + repr(i) +
-                     '_' + repr(f) +
-                     '_' + repr(c) + '.png')
+                     'Image' + "%02d" % (i,) +
+                     '_' + "%03d" % (f,) +
+                     '_' + "%02d" % (c,) + '.png')
+            labelWriter.writerow([i])
+
+labelFile.close()
