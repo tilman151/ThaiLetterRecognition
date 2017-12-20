@@ -15,9 +15,9 @@ import os
 import sys
 import csv
 import imageio
+import numpy as np
+import random as rnd
 from PIL import Image
-
-from pdb import set_trace as bp
 
 import tensorflow as tf
 
@@ -32,60 +32,82 @@ def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 
-def convert_to(inputDir, name):
+def convert_to():
     """Converts images dataset to tfrecords."""
+
+    # Initialize random number generator
+    rnd.seed()
+
+    # Look up images and label file in input directory
     imagePaths = []
     labelPath = None
     print('Looking for images...')
-    for (dirPath, dirNames, fileNames) in os.walk(inputDir):
+    for (dirPath, dirNames, fileNames) in os.walk(FLAGS.input):
         for fileName in fileNames:
             if fileName[-4:] == '.png':
                 imagePaths.append(os.path.join(dirPath, fileName))
             elif fileName == 'labels.csv':
                 labelPath = os.path.join(dirPath, fileName)
 
+    # Check if label file was found
     if labelPath is None:
         raise ValueError('No label file found. Must be named labels.csv')
 
+    # Read label file
     labels = []
     with open(labelPath, newline='') as csvfile:
         csvreader = csv.reader(csvfile, delimiter=';', quotechar='|')
         for row in csvreader:
             labels.append(row[0])
 
+    # Check consistency of labels with number of images
     num_examples = len(labels)
     if len(imagePaths) != num_examples:
         raise ValueError('Number of images %d does not match label size %d.' %
                          (len(imagePaths), num_examples))
 
+    # Set basic images properties
     rows = 64
     cols = 64
     depth = 3
+
+    # Sort image paths to match them to the right label
     imagePaths = sorted(imagePaths)
-    bp()
 
-    filename = os.path.join(FLAGS.output, name + '.tfrecords')
-    writer = tf.python_io.TFRecordWriter(filename)
+    # Initialize writers for train and eval datasets
+    trainName = os.path.join(FLAGS.output, 'train.tfrecords')
+    evalName = os.path.join(FLAGS.output, 'eval.tfrecords')
+    trainWriter = tf.python_io.TFRecordWriter(trainName)
+    evalWriter = tf.python_io.TFRecordWriter(evalName)
 
-    print('Writing records to ' + filename + ' ...')
+    # Write samples to file
+    print('Writing records to ' + trainName + ' & ' + evalName + ' ...')
     for index in range(num_examples):
         if index % 1000 == 0:
             print('\t' + 'Write image ' + repr(index))
+        # Read image
         imageRaw = imageio.imread(imagePaths[index])
+        # Build sample object
         example = tf.train.Example(features=tf.train.Features(feature={
             'height': _int64_feature(rows),
             'width': _int64_feature(cols),
             'depth': _int64_feature(depth),
             'label': _int64_feature(int(labels[index])),
-            'name': _bytes_feature(imagePaths[index]),
             'image_raw': _bytes_feature(imageRaw.tostring())}))
-        writer.write(example.SerializeToString())
-    writer.close()
+        # Assign sample randomly to train or eval with specified split
+        if rnd.random() <= FLAGS.train:
+            trainWriter.write(example.SerializeToString())
+        else:
+            evalWriter.write(example.SerializeToString())
+
+    # Close writers
+    trainWriter.close()
+    evalWriter.close()
 
 
 def main(unused_argv):
 
-    convert_to(FLAGS.input, 'train')
+    convert_to()
 
 
 if __name__ == '__main__':
@@ -101,6 +123,12 @@ if __name__ == '__main__':
         type=str,
         default='./images',
         help='Directory of the images and labels'
+    )
+    parser.add_argument(
+        '--train',
+        type=float,
+        default='0.7',
+        help='Percentage of examples for training set'
     )
     FLAGS, unparsed = parser.parse_known_args()
     tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
