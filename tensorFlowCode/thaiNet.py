@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 def inference(images, trainingMode):
     """Infers the class of the image"""
 
@@ -42,7 +43,7 @@ def inference(images, trainingMode):
     conv3Flat = tf.reshape(conv3, [-1, 14 * 14 * 150])
     fc1 = tf.layers.dense(
                 inputs=conv3Flat,
-                units = 400,
+                units=400,
                 activation=tf.nn.relu,
                 name='fc1')
 
@@ -59,6 +60,7 @@ def inference(images, trainingMode):
 
     return fc2
 
+
 def loss(prediction, labels):
     """Calculates the loss between prediction and labels"""
 
@@ -70,6 +72,7 @@ def loss(prediction, labels):
     meanEntropy = tf.reduce_mean(crossEntropy, name='meanEntropy')
 
     return meanEntropy
+
 
 def train(totalLoss):
     """Trains the network by optimizing the loss"""
