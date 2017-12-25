@@ -7,7 +7,7 @@ import math
 import thaiNetInput as data
 import thaiNet as model
 
-MODEL_DIR = './datasetGeneration/'
+MODEL_DIR = './model/'
 DATA_DIR = './datasetGeneration/'
 EVAL_DIR = './eval/'
 EVAL_INTERVAL = '60*60'
