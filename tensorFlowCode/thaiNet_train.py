@@ -2,20 +2,30 @@ import tensorflow as tf
 import time
 from datetime import datetime
 import os
+import shutil
 import thaiNetInput as data
 import thaiNet as model
 
 DATA_DIR = './datasetGeneration/'
+MODEL_DIR = './model/'
 TRAIN_DATA = 'train.tfrecords'
-BATCH_SIZE = 32  # 150 samples per batch
+BATCH_SIZE = 100  # 150 samples per batch
 LOG_FREQ = 10  # Log every 10 batches
+SAVE_FREQ = 100  # Saves a checkpoint every 100 batches
 MAX_EPOCH = 100  # 100 epochs
 
 
 def train():
     """Training script for ThaiNet"""
 
+    if os.path.exists(MODEL_DIR):
+        shutil.rmtree(MODEL_DIR)
+    os.mkdir(MODEL_DIR)
+
     global_step = tf.train.get_or_create_global_step()
+
+    saver = tf.train.Saver(max_to_keep=4)
+    modelFile = os.path.join(MODEL_DIR, 'ThaiNetFinal')
 
     maxSteps = data.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN * MAX_EPOCH / BATCH_SIZE
 
@@ -56,10 +66,17 @@ def train():
                 print (format_str % (datetime.now(), self._step, maxSteps,
                        loss_value, examples_per_sec, sec_per_batch))
 
+        def end(self, sess):
+            saver.save(sess, modelFile, global_step=self._step)
+
     with tf.train.MonitoredTrainingSession(
-            checkpoint_dir=DATA_DIR,
+            checkpoint_dir='./ckpts/',
             hooks=[tf.train.StopAtStepHook(last_step=maxSteps),
                    tf.train.NanTensorHook(loss),
+                   tf.train.CheckpointSaverHook(checkpoint_dir=MODEL_DIR,
+                                                save_steps=SAVE_FREQ,
+                                                saver=saver,
+                                                checkpoint_basename='ThaiNet'),
                    _LoggerHook()]) as sess:
         while not sess.should_stop():
             sess.run(trainOp)
