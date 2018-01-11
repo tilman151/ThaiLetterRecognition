@@ -24,9 +24,6 @@ def train():
 
     global_step = tf.train.get_or_create_global_step()
 
-    saver = tf.train.Saver(max_to_keep=4)
-    modelFile = os.path.join(MODEL_DIR, 'ThaiNetFinal')
-
     maxSteps = data.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN * MAX_EPOCH / BATCH_SIZE
 
     with tf.device('/cpu:0'):
@@ -39,6 +36,9 @@ def train():
     loss = model.loss(logits, labels)
 
     trainOp = model.train(loss)
+    
+    saver = tf.train.Saver(max_to_keep=4)
+    modelFile = os.path.join(MODEL_DIR, 'ThaiNetFinal')
 
     class _LoggerHook(tf.train.SessionRunHook):
         """Logs loss and runtime."""
